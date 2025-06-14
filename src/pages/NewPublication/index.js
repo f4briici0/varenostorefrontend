@@ -7,9 +7,6 @@ export default function NewPublication() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [storeName, setStoreName] = useState("");
   const [createdAt, setCreatedAt] = useState("");
@@ -18,8 +15,6 @@ export default function NewPublication() {
   const [priceCents, setPriceCents] = useState(0);
 
   const [titleVariation, setTitleVariation] = useState("Tamanho");
-  const [variationText, setVariationText] = useState("G");
-  const [stock, setStock] = useState(0);
 
   const [indexUser, setIndexUser] = useState(0);
 
@@ -78,10 +73,6 @@ export default function NewPublication() {
         <VariationCard
           titleVariation={titleVariation}
           setTitleVariation={setTitleVariation}
-          variationText={variationText}
-          setVariationText={setVariationText}
-          stock={stock}
-          setStock={setStock}
           onBack={() => handleUserIndex(0)}
         />
       )}
