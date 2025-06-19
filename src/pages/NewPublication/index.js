@@ -4,15 +4,17 @@ import BasicInfo from "./BasicInfoCard/BasicInfo";
 import VariationCard from "./VariationCard";
 
 export default function NewPublication() {
-  // estados existentes...
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [profileImageUrl, setProfileImageUrl] = useState("");
-  const [storeName, setStoreName] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState(
+    "https://companieslogo.com/img/orig/LREN3.SA-3e7b559f.png?t=1720244492"
+  );
+  const [storeName, setStoreName] = useState("Renner");
+  const [createdAt] = useState("");
   const [publicationDescription, setPublicationDescription] = useState("");
   const [publicationImageUrls, setPublicationImageUrls] = useState([]);
+  const [publicationFiles, setPublicationFiles] = useState([]);
   const [priceCents, setPriceCents] = useState(0);
 
   const [titleVariation, setTitleVariation] = useState("Tamanho");
@@ -20,46 +22,74 @@ export default function NewPublication() {
   const [indexUser, setIndexUser] = useState(0);
 
   const [mainVariation, setMainVariation] = useState({
-    variationText: "",
-    stock: "",
+    textoVariacao: "",
+    estoque: "",
   });
   const [additionalVariations, setAdditionalVariations] = useState([]);
 
-  useEffect(() => {
-    fetch("http://192.168.0.197:8080/publication")
-      .then((response) => {
-        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-        return response.json();
-      })
-      .then((data) => {
-        setLoading(false);
-        if (data.length > 0) {
-          setProfileImageUrl(data[0].profileImageUrl || "");
-          setStoreName(data[0].storeName || "");
-        }
-      })
-      .catch((error) => {
-        setError(error);
-        setLoading(false);
-        console.error("Erro:", error);
-      });
-  }, []);
-
-  if (loading) return <p>Carregando...</p>;
   if (error) return <p>Erro: {error.message}</p>;
 
   const handleUserIndex = (i) => setIndexUser(i);
 
-  const handleSubmit = () => {
+  const uploadImages = async () => {
+    const formData = new FormData();
+    publicationFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const response = await fetch("http://192.168.0.197:8080/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      return result;
+    } catch (err) {
+      console.error("Erro no upload:", err);
+    }
+  };
+
+  const postFinal = async (absolutePaths) => {
     const postData = {
-      imagens: publicationImageUrls,
+      imagens: absolutePaths,
       descricao: publicationDescription,
       preco: priceCents,
       tituloVariacao: titleVariation,
       variacao: mainVariation,
       variacoesAdicionais: additionalVariations,
     };
-    console.log("Dados para envio:\n\n" + JSON.stringify(postData, null, 2));
+
+    try {
+      const response = await fetch("http://192.168.0.197:8080/newpublication", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao enviar publicação: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Publicação enviada com sucesso:", data);
+      return data;
+    } catch (error) {
+      console.error("Erro no envio:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const uploadResult = await uploadImages();
+      const absolutePaths = uploadResult.absolutePaths;
+      await postFinal(absolutePaths);
+    } catch (err) {
+      console.error("Erro no processo de envio:", err);
+    }
   };
 
   return (
@@ -81,6 +111,7 @@ export default function NewPublication() {
           setPublicationDescription={setPublicationDescription}
           price={priceCents}
           setPriceCents={setPriceCents}
+          setPublicationFiles={setPublicationFiles}
           onNext={() => handleUserIndex(1)}
         />
       ) : (

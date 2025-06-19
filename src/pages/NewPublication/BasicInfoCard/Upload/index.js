@@ -1,25 +1,31 @@
-export default function Upload({ previews, setPreviews }) {
+export default function Upload({ previews, setPreviews, files, setFiles }) {
   const handleImageChange = (e) => {
-    const files = Array.from(
+    const selectedFiles = Array.from(
       e?.target?.files instanceof FileList ? e.target.files : []
     );
 
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
 
     setPreviews((prev) => {
       const safePrev = Array.isArray(prev) ? prev : [];
       const combined = [...safePrev, ...newPreviews];
       return combined.slice(0, 4);
     });
+
+    setFiles((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const combined = [...safePrev, ...selectedFiles];
+      return combined.slice(0, 4);
+    });
   };
 
   const handleRemoveImage = (indexToRemove) => {
     setPreviews((prev) => prev.filter((_, index) => index !== indexToRemove));
+    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   return (
     <div className="w-full">
-      {/* Imagens carregadas */}
       <div className="flex items-center gap-3 ml-2 overflow-x-auto pr-5 mt-3">
         {previews.map((preview, index) => (
           <div

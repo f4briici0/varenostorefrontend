@@ -6,8 +6,8 @@ export default function BasicInfo({
   setPreviews,
   publicationDescription,
   setPublicationDescription,
-  priceCents,
   setPriceCents,
+  setPublicationFiles,
   onNext,
 }) {
   const [tPriceCents, setTPriceCents] = useState("");
@@ -26,7 +26,11 @@ export default function BasicInfo({
     <div className="w-11/12 sm:w-[450px] m-auto">
       <p className="font-bold mb-1 text-xl ml-3 mt-3">Informações básicas</p>
 
-      <Upload previews={previews} setPreviews={setPreviews} />
+      <Upload
+        previews={previews}
+        setPreviews={setPreviews}
+        setFiles={setPublicationFiles}
+      />
 
       <hr className="w-11/12 m-auto mt-7 mb-5" />
 

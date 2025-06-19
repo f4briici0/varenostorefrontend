@@ -7,32 +7,32 @@ export default function VariationCard({
   setMainVariation,
   setAdditionalVariations: setParentAdditionalVariations,
 }) {
-  const [variationText, setVariationText] = useState("P");
-  const [stock, setStock] = useState("0");
+  const [textoVariacao, setTextoVariacao] = useState("P");
+  const [estoque, setEstoque] = useState("0");
 
   const [additionalVariations, setAdditionalVariations] = useState([]);
 
-  const handleStockChange = (e) => {
+  const handleEstoqueChange = (e) => {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length > 6) value = value.slice(0, 6);
-    setStock(value);
+    setEstoque(value);
   };
 
   const handleAddVariation = () => {
-    if (!variationText.trim() || !stock.trim() || stock === "0") {
+    if (!textoVariacao.trim() || !estoque.trim() || estoque === "0") {
       alert("Preencha a variação e o estoque corretamente antes de adicionar.");
       return;
     }
 
     const newVariation = {
       id: Date.now(),
-      variationText: variationText.trim(),
-      stock,
+      textoVariacao: textoVariacao.trim(),
+      estoque,
     };
 
     setAdditionalVariations((prev) => [...prev, newVariation]);
-    setVariationText("");
-    setStock("0");
+    setTextoVariacao("");
+    setEstoque("0");
   };
 
   const handleRemoveVariation = (id) => {
@@ -45,7 +45,7 @@ export default function VariationCard({
         v.id === id
           ? {
               ...v,
-              [field]: field === "stock" ? value.replace(/\D/g, "") : value,
+              [field]: field === "estoque" ? value.replace(/\D/g, "") : value,
             }
           : v
       )
@@ -54,9 +54,9 @@ export default function VariationCard({
 
   useEffect(() => {
     if (setMainVariation) {
-      setMainVariation({ variationText, stock });
+      setMainVariation({ textoVariacao, estoque });
     }
-  }, [variationText, stock, setMainVariation]);
+  }, [textoVariacao, estoque, setMainVariation]);
 
   useEffect(() => {
     if (setParentAdditionalVariations) {
@@ -71,13 +71,12 @@ export default function VariationCard({
           {titleVariation}
         </h1>
         <div className="mt-3 flex flex-wrap gap-3">
-          <VariationDisplay variationText={variationText} stock={stock} />
-
-          {additionalVariations.map(({ id, variationText, stock }) => (
+          <VariationDisplay textoVariacao={textoVariacao} estoque={estoque} />
+          {additionalVariations.map(({ id, textoVariacao, estoque }) => (
             <VariationDisplay
               key={id}
-              variationText={variationText}
-              stock={stock}
+              textoVariacao={textoVariacao}
+              estoque={estoque}
             />
           ))}
         </div>
@@ -104,19 +103,19 @@ export default function VariationCard({
         />
 
         <VariationInput
-          variationText={variationText}
-          setVariationText={setVariationText}
-          stock={stock}
-          handleStockChange={handleStockChange}
+          textoVariacao={textoVariacao}
+          setTextoVariacao={setTextoVariacao}
+          estoque={estoque}
+          handleEstoqueChange={handleEstoqueChange}
           labelPrefix="Variação Principal"
         />
 
-        {additionalVariations.map(({ id, variationText, stock }) => (
+        {additionalVariations.map(({ id, textoVariacao, estoque }) => (
           <VariationEdit
             key={id}
             id={id}
-            variationText={variationText}
-            stock={stock}
+            textoVariacao={textoVariacao}
+            estoque={estoque}
             onRemove={handleRemoveVariation}
             onChange={handleVariationChange}
           />
@@ -157,20 +156,20 @@ export default function VariationCard({
   );
 }
 
-function VariationDisplay({ variationText, stock }) {
+function VariationDisplay({ textoVariacao, estoque }) {
   return (
     <div className="border border-gray-500 px-5 flex flex-col justify-center items-center rounded-lg">
-      <p className="font-medium text-gray-500">{variationText || "—"}</p>
-      <p className="font-bold text-gray-400">Estoque: {stock || "0"}</p>
+      <p className="font-medium text-gray-500">{textoVariacao || "—"}</p>
+      <p className="font-bold text-gray-400">Estoque: {estoque || "0"}</p>
     </div>
   );
 }
 
 function VariationInput({
-  variationText,
-  setVariationText,
-  stock,
-  handleStockChange,
+  textoVariacao,
+  setTextoVariacao,
+  estoque,
+  handleEstoqueChange,
   labelPrefix,
 }) {
   return (
@@ -182,8 +181,8 @@ function VariationInput({
         className="w-11/12 p-2 border border-gray-500 rounded-lg mt-1 ml-3"
         type="text"
         placeholder="(M, G) (32, 41) (Azul, Branco)"
-        value={variationText}
-        onChange={(e) => setVariationText(e.target.value)}
+        value={textoVariacao}
+        onChange={(e) => setTextoVariacao(e.target.value)}
       />
       <label className="ml-3 mt-3 text-gray-600 font-bold">
         Estoque Disponível
@@ -193,24 +192,24 @@ function VariationInput({
         inputMode="numeric"
         className="w-11/12 p-2 border border-gray-300 rounded-md ml-3 mt-1"
         placeholder="Ex. 1"
-        value={stock}
-        onChange={handleStockChange}
+        value={estoque}
+        onChange={handleEstoqueChange}
         maxLength={6}
       />
     </div>
   );
 }
 
-function VariationEdit({ id, variationText, stock, onRemove, onChange }) {
+function VariationEdit({ id, textoVariacao, estoque, onRemove, onChange }) {
   return (
     <div className="border border-gray-500 flex flex-col w-11/12 mt-3 pb-3 rounded">
       <div className="flex justify-between">
         <label className="ml-3 mt-3 text-gray-600 font-bold">Variação</label>
         <button
-          className=" text-red-500 mr-1"
+          className="text-red-500 mr-1"
           onClick={() => onRemove(id)}
           type="button"
-          aria-label={`Remover variação ${variationText}`}
+          aria-label={`Remover variação ${textoVariacao}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -232,8 +231,8 @@ function VariationEdit({ id, variationText, stock, onRemove, onChange }) {
         className="w-11/12 p-2 border border-gray-500 rounded-lg mt-1 ml-3"
         type="text"
         placeholder="(M, G) (32, 41) (Azul, Branco)"
-        value={variationText}
-        onChange={(e) => onChange(id, "variationText", e.target.value)}
+        value={textoVariacao}
+        onChange={(e) => onChange(id, "textoVariacao", e.target.value)}
       />
       <label className="ml-3 mt-3 text-gray-600 font-bold">
         Estoque Disponível
@@ -243,8 +242,8 @@ function VariationEdit({ id, variationText, stock, onRemove, onChange }) {
         inputMode="numeric"
         className="w-11/12 p-2 border border-gray-300 rounded-md ml-3 mt-1"
         placeholder="Ex. 1"
-        value={stock}
-        onChange={(e) => onChange(id, "stock", e.target.value)}
+        value={estoque}
+        onChange={(e) => onChange(id, "estoque", e.target.value)}
         maxLength={6}
       />
     </div>
